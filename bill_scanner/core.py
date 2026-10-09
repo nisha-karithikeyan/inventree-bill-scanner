@@ -20,7 +20,7 @@ from plugin.mixins import (
 )
 
 from . import PLUGIN_VERSION
-from .gemini import is_google_api_host
+from .gemini import DEFAULT_MODEL, MAX_REQUEST_TIMEOUT, is_google_api_host
 
 
 def validate_api_host(value: str) -> None:
@@ -89,8 +89,10 @@ class BillScannerPlugin(
         },
         'GEMINI_MODEL': {
             'name': _('Gemini Model'),
-            'description': _('Model name, for example gemini-2.5-flash'),
-            'default': 'gemini-2.5-flash',
+            'description': _('Gemini model name, for example {model}').format(
+                model=DEFAULT_MODEL
+            ),
+            'default': DEFAULT_MODEL,
         },
         'GEMINI_API_URL': {
             'name': _('Gemini API Host'),
@@ -103,7 +105,11 @@ class BillScannerPlugin(
             'description': _('Seconds to wait for Gemini before giving up'),
             'default': 120,
             'units': 's',
-            'validator': [int, MinValueValidator(10), MaxValueValidator(600)],
+            'validator': [
+                int,
+                MinValueValidator(10),
+                MaxValueValidator(MAX_REQUEST_TIMEOUT),
+            ],
         },
         'MAX_ATTEMPTS': {
             'name': _('Maximum Attempts'),
@@ -195,7 +201,7 @@ class BillScannerPlugin(
                 'The Gemini API host must be a googleapis.com host'
             )
 
-        model = str(self.get_setting('GEMINI_MODEL') or 'gemini-2.5-flash')
+        model = str(self.get_setting('GEMINI_MODEL') or DEFAULT_MODEL)
         try:
             response = call_with_classification(
                 self.api_call,

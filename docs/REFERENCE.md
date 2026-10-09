@@ -18,9 +18,9 @@ contributing, see [CONTRIBUTING.md](../CONTRIBUTING.md).
 | Setting                  | Default                                    | Meaning                                                                  |
 | ------------------------ | ------------------------------------------ | ------------------------------------------------------------------------ |
 | Gemini API Key           | (empty)                                    | Required. Stored as a protected setting and never sent to the browser.   |
-| Gemini Model             | `gemini-2.5-flash`                         | A Gemini model that accepts images and PDFs.                              |
+| Gemini Model             | `gemini-3.8-flash`                         | A Gemini model that accepts images and PDFs. Google retires old models; if a call fails with HTTP 404, choose a current one. |
 | Gemini API Host          | `generativelanguage.googleapis.com/v1beta` | Only `googleapis.com` hosts are accepted (regional endpoints are fine).  |
-| Request Timeout          | 120 s                                      | How long one Gemini call may take.                                       |
+| Request Timeout          | 120 s                                      | How long one Gemini call may take (10–240 s; the worker task gets 30 s more). |
 | Maximum Attempts         | 3                                          | Total tries for a bill before it is marked failed.                       |
 | Maximum Upload Size      | 15 MB                                      | Largest accepted file (Gemini's inline data limit is about 20 MB).       |
 | Minimum Name Match Score | 70                                         | Fuzzy name matches below this score (0–100) are ignored.                  |

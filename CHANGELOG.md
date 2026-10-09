@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Found during the first real end-to-end test with the Gemini API.
+
+### Fixed
+
+- The default model `gemini-2.5-flash` is no longer available to new API
+  keys; the default is now `gemini-3.8-flash`. A 404 from Gemini now says to
+  check the *Gemini Model* setting. Existing installs keep their stored model
+  setting and may need to change it.
+- Slow Gemini replies could exceed InvenTree's 90-second worker time limit.
+  The task was killed mid-request and the bill stayed in *Extracting* until
+  the 15-minute rescue. The task now gets *Request Timeout* + 30 s, and a
+  time-limit kill is retried like any other transient error.
+
+### Changed
+
+- *Request Timeout* is limited to 240 seconds, to fit InvenTree's
+  per-task time limit.
+
 ## [0.1.0] - 2026-10-09
 
 First public release (beta). Extraction has been tested with mocked Gemini

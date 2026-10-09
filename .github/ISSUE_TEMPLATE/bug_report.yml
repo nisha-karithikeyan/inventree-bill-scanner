@@ -70,7 +70,7 @@ body:
     id: model
     attributes:
       label: Gemini model setting
-      placeholder: gemini-2.5-flash
+      placeholder: gemini-3.8-flash
 
   - type: dropdown
     id: file-type

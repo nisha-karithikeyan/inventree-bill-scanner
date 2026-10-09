@@ -99,6 +99,21 @@ class ReadResponseTest(TestCase):
                 read_response(fake_response(status, {'error': {'message': 'nope'}}))
             self.assertIn('nope', str(ctx.exception))
 
+    def test_retired_model_points_to_the_setting(self):
+        """A 404 for a retired model says which setting to change.
+
+        Regression: the first real call failed with this exact reply, because
+        the default model had been withdrawn for new API keys.
+        """
+        message = (
+            'This model models/gemini-2.5-flash is no longer available to new '
+            'users. Please update your code to use models/gemini-3.8-flash.'
+        )
+        with self.assertRaises(PermanentGeminiError) as ctx:
+            read_response(fake_response(404, {'error': {'message': message}}))
+        self.assertIn('no longer available', str(ctx.exception))
+        self.assertIn('Gemini Model setting', str(ctx.exception))
+
     def test_error_body_not_json(self):
         """A non-JSON error body still yields a message."""
         with self.assertRaises(PermanentGeminiError) as ctx:
