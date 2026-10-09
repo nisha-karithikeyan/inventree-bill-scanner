@@ -15,6 +15,32 @@ human checking the result.**
 > mocked Gemini responses so far. Real-world accuracy results will be
 > published in [`eval/results/`](eval/README.md) once they have been measured.
 
+## InvenTree and this plugin
+
+**[InvenTree](https://inventree.org)** is an existing open-source inventory
+management system ([GitHub](https://github.com/inventree/InvenTree), MIT
+license), developed by the InvenTree developers and community. It tracks
+parts, suppliers, purchase orders and stock, and it has a plugin system that
+lets anyone add features without changing InvenTree's own code.
+
+**This repository is a separate plugin for InvenTree, created by Nisha
+Karthikeyan.** It is not part of InvenTree. It adds one workflow that InvenTree
+doesn't have out of the box: turning a supplier bill into a purchase order
+automatically. This project built:
+
+- the bill upload, plus the background extraction with Google Gemini and its
+  retries,
+- the matching of bill lines to existing parts and suppliers, with confidence
+  scores,
+- the review panel shown inside InvenTree's Purchasing page,
+- the step that creates and receives the purchase order, with duplicate
+  protection and an audit log,
+- the tests, accuracy evaluation, demo data and documentation.
+
+Everything else, such as parts, suppliers, purchase orders, stock, users,
+permissions and the web interface, is InvenTree's. The plugin uses
+InvenTree's public plugin interfaces and does not modify InvenTree.
+
 ## What it does
 
 ```text
@@ -45,6 +71,8 @@ human checking the result.**
 
 ## Contents
 
+- [InvenTree and this plugin](#inventree-and-this-plugin)
+- [What it does](#what-it-does)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Settings](#settings)
@@ -399,7 +427,8 @@ plugin here, not to the InvenTree project.
 
 ## Author
 
-**Nisha Karthikeyan**
+This plugin was created and is maintained by **Nisha Karthikeyan**. InvenTree
+itself is developed by the [InvenTree developers](https://github.com/inventree/InvenTree).
 
 - GitHub: [@nisha-karithikeyan](https://github.com/nisha-karithikeyan)
 - Website: [nishakarithikeyan.framer.website](https://nishakarithikeyan.framer.website)
