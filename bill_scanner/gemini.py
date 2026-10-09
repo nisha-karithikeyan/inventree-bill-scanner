@@ -25,6 +25,16 @@ SUPPORTED_TYPES = {
 
 RETRYABLE_STATUS = {408, 429, 500, 502, 503, 504}
 
+# A pinned model, not an alias such as gemini-flash-latest, so results do not
+# change silently. Google retires models, so check this before each release.
+DEFAULT_MODEL = 'gemini-3.8-flash'
+
+# The HTTP call runs inside a django-q task, which is killed when its time
+# limit runs out. InvenTree caps a per-task limit at 30 s below its broker
+# retry interval (300 s by default), so 270 s; the call plus a margin must fit.
+TASK_TIMEOUT_MARGIN = 30
+MAX_REQUEST_TIMEOUT = 240
+
 # The API key and the bill travel to this host, so only Google may receive them.
 GOOGLE_API_DOMAIN = 'googleapis.com'
 
@@ -121,6 +131,12 @@ def read_response(response: requests.Response) -> Any:
     if response.status_code in RETRYABLE_STATUS:
         raise TransientGeminiError(
             f'Gemini returned HTTP {response.status_code}: {_error_message(response)}'
+        )
+    if response.status_code == 404:
+        # Almost always a model name that does not exist or has been retired.
+        raise PermanentGeminiError(
+            f'Gemini returned HTTP 404: {_error_message(response)} '
+            '(Check the Gemini Model setting of the Bill Scanner plugin.)'
         )
     if response.status_code != 200:
         raise PermanentGeminiError(

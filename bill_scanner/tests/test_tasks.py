@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 import requests
+from django_q.exceptions import TimeoutException
 from plugin.models import PluginSetting
 
 from bill_scanner import tasks
@@ -91,6 +92,17 @@ class ExtractTaskTest(PluginTestCase):
         self.assertEqual(bill.status, Bill.Status.FAILED)
         self.assertIn('Unexpected error', bill.error)
 
+    def test_worker_time_limit_is_retried(self):
+        """A task killed by django-q's time limit is retried, not left stuck.
+
+        Regression: django-q raises TimeoutException (a SystemExit) inside the
+        HTTP call; it escaped 'except Exception' and left the bill processing.
+        """
+        error = TimeoutException('Task exceeded maximum timeout value (90 seconds)')
+        bill = self.run_with(self.make_bill(), side_effect=error)
+        self.assertEqual(bill.status, Bill.Status.RETRY)
+        self.assertIn('time limit', bill.error)
+
     def test_missing_key_fails(self):
         """Without a key the real request method fails permanently."""
         self.plugin.set_setting('GEMINI_API_KEY', '')
@@ -110,6 +122,17 @@ class ExtractTaskTest(PluginTestCase):
 
 class GeminiCallTest(PluginTestCase):
     """The plugin's HTTP call goes through APICallMixin with the right headers."""
+
+    def test_default_model(self):
+        """Without a model setting, the current default model is called."""
+        self.plugin.set_setting('GEMINI_API_KEY', 'secret-key')
+        self.assertEqual(self.plugin.get_setting('GEMINI_MODEL'), 'gemini-3.8-flash')
+        reply = fake_response(200, gemini_body(json.dumps(SAMPLE_REPLY)))
+        with mock.patch('requests.request', return_value=reply) as request:
+            self.plugin.request_extraction(b'%PDF-1', 'application/pdf')
+        self.assertIn(
+            '/models/gemini-3.8-flash:generateContent', request.call_args.kwargs['url']
+        )
 
     def test_request_shape(self):
         """URL, key header, timeout and body are correct."""
@@ -255,7 +278,12 @@ class RetrySchedulerTest(PluginTestCase):
         self.assertEqual(spent.status, Bill.Status.FAILED)
 
     def test_queue_uses_offload_task(self):
-        """Extraction is offloaded to the django-q2 worker without q2 retries."""
+        """Extraction is offloaded without q2 retries, with room for the HTTP call.
+
+        Regression: the worker's default 90 s task limit was shorter than the
+        120 s request timeout, so slow Gemini replies killed the task.
+        """
+        self.plugin.set_setting('REQUEST_TIMEOUT', 120)
         bill = self.make_bill()
         with mock.patch.object(tasks, 'offload_task') as offload:
             tasks.queue_extraction(bill)
@@ -264,7 +292,14 @@ class RetrySchedulerTest(PluginTestCase):
             bill.pk,
             group='bill_scanner',
             retry=False,
+            timeout=150,
         )
+
+    def test_request_timeout_fits_the_worker_limit(self):
+        """The request timeout cannot exceed what InvenTree lets a task run."""
+        with self.assertRaises(ValidationError):
+            self.plugin.set_setting('REQUEST_TIMEOUT', 300)
+        self.plugin.set_setting('REQUEST_TIMEOUT', tasks.MAX_REQUEST_TIMEOUT)
 
     def test_backoff_doubles(self):
         """Backoff is 30s, 60s, 120s."""

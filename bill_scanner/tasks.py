@@ -8,12 +8,13 @@ from django.db import transaction
 from django.utils import timezone
 
 import structlog
+from django_q.exceptions import TimeoutException
 from InvenTree.exceptions import log_error
 from InvenTree.tasks import offload_task
 from plugin import registry
 
 from .extraction import ExtractedBill, ExtractionError, parse_extraction
-from .gemini import GeminiError
+from .gemini import MAX_REQUEST_TIMEOUT, TASK_TIMEOUT_MARGIN, GeminiError
 from .matching import match_bill
 from .models import Bill, BillLine
 
@@ -39,10 +40,18 @@ def queue_extraction(bill: Bill) -> None:
     """Hand a bill to the background worker.
 
     django-q2 retries are switched off: this plugin tracks attempts itself,
-    so a failure never triggers a second, uncounted redelivery.
+    so a failure never triggers a second, uncounted redelivery. The task gets
+    enough time for the whole HTTP call; InvenTree's default limit is 90 s.
     """
+    plugin = get_plugin()
+    request_timeout = int((plugin and plugin.get_setting('REQUEST_TIMEOUT')) or 120)
+    request_timeout = min(request_timeout, MAX_REQUEST_TIMEOUT)
     offload_task(
-        'bill_scanner.tasks.extract_bill', bill.pk, group=TASK_GROUP, retry=False
+        'bill_scanner.tasks.extract_bill',
+        bill.pk,
+        group=TASK_GROUP,
+        retry=False,
+        timeout=request_timeout + TASK_TIMEOUT_MARGIN,
     )
 
 
@@ -125,6 +134,16 @@ def extract_bill(bill_id: int) -> None:
         return
     except ExtractionError as exc:
         _fail(bill, f'Could not read the bill: {exc}', True, max_attempts)
+        return
+    except TimeoutException:
+        # django-q's time limit raises a SystemExit subclass, which the
+        # 'except Exception' below would miss, leaving the bill processing.
+        _fail(
+            bill,
+            'Gemini did not answer within the worker time limit',
+            True,
+            max_attempts,
+        )
         return
     except Exception as exc:
         log_error('bill_scanner.extract_bill', plugin=SLUG)
