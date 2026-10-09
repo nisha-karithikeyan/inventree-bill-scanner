@@ -58,6 +58,15 @@ dev/ui.sh         # InvenTree's React UI on http://localhost:5173
 
 Set `INVENTREE_SRC=/path/to/InvenTree` if your checkout lives somewhere else.
 
+Other helpers:
+
+- `dev/demo.sh --fresh` moves the dev database and media to
+  `.dev/backup/<time>/` and starts from an empty instance.
+- `dev/seed_demo.sh` creates already-extracted demo bills from canned replies,
+  so you can see the screens without an API key.
+- `node dev/screenshots.mjs` recaptures `docs/screenshots/` from a running dev
+  instance seeded with `dev/seed_demo.sh`.
+
 You only need a Gemini API key to try real extraction. None of the tests use
 one. Enter a key only in the plugin settings in the UI, never in code, config
 files or commits.
