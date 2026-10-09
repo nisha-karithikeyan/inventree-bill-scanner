@@ -103,8 +103,11 @@ class BillApiTest(PluginTestCase):
     def test_delete(self):
         """Unreceived bills can be deleted; received ones cannot."""
         bill = self.make_bill(status=Bill.Status.REVIEW)
+        storage, name = bill.file.storage, bill.file.name
+        self.assertTrue(storage.exists(name))
         self.delete(f'{API}/bills/{bill.pk}/', expected_code=204)
         self.assertFalse(Bill.objects.filter(pk=bill.pk).exists())
+        self.assertFalse(storage.exists(name), 'the uploaded file is removed too')
 
         done = self.make_bill(status=Bill.Status.COMPLETED)
         self.delete(f'{API}/bills/{done.pk}/', expected_code=400)

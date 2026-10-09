@@ -1,0 +1,51 @@
+name: Feature request
+description: Suggest an idea or improvement for the plugin
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are very welcome. Describing the problem first helps more than a
+        finished solution.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      placeholder: When I scan bills from supplier X, I always have to ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would you like to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you have considered
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Extraction (reading bills)
+        - Part and supplier matching
+        - Review panel (UI)
+        - Purchase order and stock creation
+        - Settings, permissions or security
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contributing
+      options:
+        - label: I would like to work on this myself.

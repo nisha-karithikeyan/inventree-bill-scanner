@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The InvenTree commit this plugin is developed and tested against (1.6.0 dev).
+  # Bump it deliberately, in its own pull request.
+  INVENTREE_REF: 800cbe0d30687124aaeb143dbca6e04c64c7cffd
+  PYTHON_VERSION: '3.12'
+  # No test talks to Gemini (HTTP is mocked), so CI never needs an API key.
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: pip install ruff==0.16.10
+      - run: ruff check .
+      - run: ruff format --check .
+
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out the plugin
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Check out InvenTree
+        uses: actions/checkout@v4
+        with:
+          repository: inventree/InvenTree
+          ref: ${{ env.INVENTREE_REF }}
+          path: InvenTree
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            InvenTree/src/backend/requirements.txt
+            InvenTree/src/backend/requirements-dev.txt
+
+      - name: Install InvenTree and the plugin
+        run: |
+          python -m venv plugin/.venv
+          plugin/.venv/bin/pip install --upgrade pip
+          plugin/.venv/bin/pip install \
+            -r InvenTree/src/backend/requirements.txt \
+            -r InvenTree/src/backend/requirements-dev.txt
+          plugin/.venv/bin/pip install -e "plugin[dev]"
+
+      - name: Run backend tests with coverage
+        env:
+          INVENTREE_SRC: ${{ github.workspace }}/InvenTree
+          COVERAGE: '1'
+        run: plugin/dev/test.sh
+
+      - name: Run eval scorer tests
+        working-directory: plugin
+        run: .venv/bin/python -m unittest discover eval
+
+  frontend:
+    name: Frontend type check and tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: yarn
+          cache-dependency-path: frontend/yarn.lock
+      - run: yarn install --frozen-lockfile
+      - run: yarn typecheck
+      - run: yarn test
