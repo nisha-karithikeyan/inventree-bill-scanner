@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "inventree-bill-scanner"
+description = "Scan supplier bills with Gemini Vision and turn them into received InvenTree purchase orders"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+dynamic = ["version"]
+authors = [{ name = "Nisha Karthikeyan" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Framework :: Django",
+    "Framework :: InvenTree",
+]
+keywords = ["inventree", "inventreeplugins", "invoice", "ocr", "gemini"]
+dependencies = [
+    "rapidfuzz>=3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/nisha-karithikeyan/inventree-bill-scanner"
+
+[project.entry-points."inventree_plugins"]
+BillScanner = "bill_scanner.core:BillScannerPlugin"
+
+[tool.setuptools.dynamic]
+version = { attr = "bill_scanner.PLUGIN_VERSION" }
+
+[tool.setuptools.packages.find]
+include = ["bill_scanner*"]
+
+[tool.setuptools.package-data]
+bill_scanner = ["static/**/*", "migrations/*.py"]
+
+[tool.ruff]
+# Mirrors InvenTree's own ruff settings so the code reads like core code.
+line-length = 88
+target-version = "py311"
+exclude = ["frontend", ".dev", ".venv"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+skip-magic-trailing-comma = true
+
+[tool.ruff.lint]
+select = ["B", "C4", "D", "E", "F", "I", "PIE", "SIM", "UP", "W"]
+ignore = ["D105", "SIM102", "SIM105", "SIM117"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+known-third-party = ["InvenTree", "common", "company", "order", "part", "plugin", "stock", "users"]
+known-first-party = ["bill_scanner"]
+section-order = ["future", "standard-library", "django", "third-party", "first-party", "local-folder"]
+
+[tool.ruff.lint.isort.sections]
+django = ["django", "rest_framework", "djmoney"]
+
+[tool.ruff.lint.per-file-ignores]
+"bill_scanner/migrations/*" = ["D", "E501"]
+"bill_scanner/tests/*" = ["D102", "E501"]
+"dev/*" = ["E501"]
+
+[tool.mypy]
+ignore_missing_imports = true

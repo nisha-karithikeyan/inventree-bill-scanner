@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.ruff_cache/
+.mypy_cache/
+
+# Tests and coverage
+.coverage
+.coverage.*
+htmlcov/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Local dev instance (database, media, secret key, logs)
+.dev/
+*.sqlite3
+*.log
+
+# Secrets
+.env
+.env.*
+*.pem
+secret_key.txt
+
+# Real bills and evaluation data: never commit
+eval/bills/*
+!eval/bills/.gitkeep
+eval/results/*
+!eval/results/.gitkeep
+test_bills/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store

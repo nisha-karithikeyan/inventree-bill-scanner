@@ -1,0 +1,10 @@
+[run]
+source = bill_scanner
+omit =
+    */tests/*
+    */migrations/*
+data_file = ${COVERAGE_FILE-.coverage}
+
+[report]
+show_missing = True
+skip_covered = False

@@ -1,0 +1,65 @@
+{
+  "supplier_name": "Brightline Components Ltd",
+  "bill_number": "BRL-INV-24817",
+  "bill_date": "2026-10-06",
+  "currency": "USD",
+  "expected_supplier": "Brightline Components",
+  "lines": [
+    {
+      "description": "Hex socket screw M3x10 A2",
+      "sku": "BRL-M3-10",
+      "quantity": 200,
+      "unit_price": 0.045,
+      "expected_part": "SCR-M3-10"
+    },
+    {
+      "description": "Hex nut M3 stainless",
+      "sku": "BRL-NM3",
+      "quantity": 200,
+      "unit_price": 0.02,
+      "expected_part": "NUT-M3"
+    },
+    {
+      "description": "Res 10k 1% 0603",
+      "sku": "BRL-R10K-0603",
+      "quantity": 500,
+      "unit_price": 0.008,
+      "expected_part": "RES-10K-0603"
+    },
+    {
+      "description": "Cap 100nF X7R 0603",
+      "sku": "BRL-C100N-0603",
+      "quantity": 500,
+      "unit_price": 0.012,
+      "expected_part": "CAP-100N-0603"
+    },
+    {
+      "description": "Red LED 5mm diffused",
+      "sku": "",
+      "quantity": 50,
+      "unit_price": 0.09,
+      "expected_part": "LED-R-5"
+    },
+    {
+      "description": "LDO regulator 3.3V SOT-223",
+      "sku": "FS1117-3.3",
+      "quantity": 20,
+      "unit_price": 0.35,
+      "expected_part": "VREG-3V3"
+    },
+    {
+      "description": "USB C to C cable 1 m",
+      "sku": "",
+      "quantity": 5,
+      "unit_price": 2.8,
+      "expected_part": "CBL-USBC-1M"
+    },
+    {
+      "description": "Pin header 1x40 2.54mm",
+      "sku": "BRL-HDR40",
+      "quantity": 20,
+      "unit_price": 0.25,
+      "expected_part": "HDR-1X40"
+    }
+  ]
+}

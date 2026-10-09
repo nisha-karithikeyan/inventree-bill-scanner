@@ -1,0 +1,29 @@
+{
+  "supplier_name": "Demo Electronics Supply",
+  "expected_supplier": "Demo Electronics Supply",
+  "bill_number": "DES-2057",
+  "bill_date": "2026-10-02",
+  "currency": "USD",
+  "lines": [
+    {
+      "description": "Hex socket screw M3x10",
+      "sku": "DES-M3-10",
+      "quantity": 100,
+      "unit_price": 0.05,
+      "expected_part": "SCR-M3-10"
+    },
+    {
+      "description": "Red LED 5 mm diffused",
+      "sku": "",
+      "quantity": 50,
+      "unit_price": 0.08,
+      "expected_part": "LED-R-5"
+    },
+    {
+      "description": "Packing and handling",
+      "quantity": 1,
+      "unit_price": 2.5,
+      "expected_part": null
+    }
+  ]
+}
