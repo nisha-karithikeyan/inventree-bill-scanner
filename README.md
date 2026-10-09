@@ -17,29 +17,86 @@ human checking the result.**
 
 ## InvenTree and this plugin
 
-**[InvenTree](https://inventree.org)** is an existing open-source inventory
-management system ([GitHub](https://github.com/inventree/InvenTree), MIT
-license), developed by the InvenTree developers and community. It tracks
-parts, suppliers, purchase orders and stock, and it has a plugin system that
-lets anyone add features without changing InvenTree's own code.
+### What is InvenTree?
 
-**This repository is a separate plugin for InvenTree, created by Nisha
-Karthikeyan.** It is not part of InvenTree. It adds one workflow that InvenTree
-doesn't have out of the box: turning a supplier bill into a purchase order
-automatically. This project built:
+**InvenTree** ([inventree.org](https://inventree.org), source code on
+[GitHub](https://github.com/inventree/InvenTree)) is an existing open-source
+inventory management system, developed by the InvenTree developers and
+community under the MIT license. Businesses use it to track parts,
+suppliers, purchase orders, stock and manufacturing. It has a plugin system
+that lets anyone add new features without changing InvenTree's own code.
 
-- the bill upload, plus the background extraction with Google Gemini and its
-  retries,
-- the matching of bill lines to existing parts and suppliers, with confidence
-  scores,
-- the review panel shown inside InvenTree's Purchasing page,
-- the step that creates and receives the purchase order, with duplicate
-  protection and an audit log,
-- the tests, accuracy evaluation, demo data and documentation.
+### What is this plugin?
+
+**inventree-bill-scanner is a separate plugin for InvenTree, created by Nisha
+Karthikeyan.** It is not part of InvenTree, and it does not modify
+InvenTree. It is installed alongside InvenTree with `pip`.
+
+It adds one workflow that InvenTree does not have out of the box: turning a
+paper or PDF **supplier bill** into a **received purchase order**. Normally,
+when goods arrive, someone types the bill into InvenTree by hand: the
+supplier, the bill number, and each line's part, quantity and price. Then
+they create the purchase order and receive the stock. This plugin reads the
+bill with Google Gemini, finds the matching parts in InvenTree, and prepares
+everything. A person checks it and confirms with one click.
+
+### What this project contributes
+
+All of the following was built in this repository. InvenTree provides the
+platform it runs on.
+
+- **Bill reading:** upload a photo or PDF, then a background task sends it to
+  Google Gemini and gets the supplier, bill number, date and lines back as
+  structured data, with retries if the call fails.
+- **Part matching:** each line is matched to an existing InvenTree part by
+  supplier SKU, manufacturer part number, internal part number or fuzzy name,
+  with a confidence score.
+- **Review screen:** a panel inside InvenTree's Purchasing page where
+  uncertain lines are highlighted and anything can be corrected before
+  confirming.
+- **Order and stock creation:** creates the purchase order and receives the
+  stock using InvenTree's own functions. It blocks bills that were already
+  received and records an audit log of who did what.
+- **Quality and documentation:** automated tests, an accuracy evaluation
+  tool, demo data and guides.
 
 Everything else, such as parts, suppliers, purchase orders, stock, users,
-permissions and the web interface, is InvenTree's. The plugin uses
-InvenTree's public plugin interfaces and does not modify InvenTree.
+permissions and the web interface, is InvenTree's.
+
+### Why it is useful
+
+**Usage value (for people who use InvenTree)**
+
+- **Less manual typing.** Bills are read and matched for you; you check and
+  correct instead of entering every line.
+- **Fewer mistakes reach the books.** Nothing is created until a person
+  confirms. Uncertain lines are highlighted, and the same bill cannot be
+  received twice.
+- **Stock stays up to date.** Receiving a bill becomes quick enough to do as
+  soon as goods arrive.
+- **Traceability.** Every upload, edit and confirmation is logged with the
+  user and time, and the original bill file is kept with the record.
+- **Works with your existing data.** It uses your parts, suppliers,
+  locations and permissions; there is nothing new to set up apart from an API
+  key.
+
+**Commercial value (for businesses and integrators)**
+
+- **Lower admin cost for goods-in.** This is aimed at small manufacturers,
+  workshops, labs and shops that receive many supplier bills and run
+  InvenTree.
+- **Low running cost.** It needs no extra servers or paid software, only
+  InvenTree's existing background worker and a Gemini API key, billed by
+  Google per use.
+- **Free to use and adapt.** Under the MIT license, companies and InvenTree
+  consultants can deploy, customise or offer it as part of their services.
+- **Extends what InvenTree can do.** It adds AI-assisted bill entry to an
+  open-source inventory system as an optional plugin. Teams don't need a
+  separate commercial tool for this step.
+
+> These benefits describe what the plugin is designed to do. It is in beta,
+> and its real-world accuracy has not been measured yet (see the status note
+> above).
 
 ## What it does
 
@@ -72,6 +129,10 @@ InvenTree's public plugin interfaces and does not modify InvenTree.
 ## Contents
 
 - [InvenTree and this plugin](#inventree-and-this-plugin)
+  - [What is InvenTree?](#what-is-inventree)
+  - [What is this plugin?](#what-is-this-plugin)
+  - [What this project contributes](#what-this-project-contributes)
+  - [Why it is useful](#why-it-is-useful)
 - [What it does](#what-it-does)
 - [Requirements](#requirements)
 - [Installation](#installation)
@@ -431,7 +492,7 @@ This plugin was created and is maintained by **Nisha Karthikeyan**. InvenTree
 itself is developed by the [InvenTree developers](https://github.com/inventree/InvenTree).
 
 - GitHub: [@nisha-karithikeyan](https://github.com/nisha-karithikeyan)
-- Website: [nishakarithikeyan.framer.website](https://nishakarithikeyan.framer.website)
+- LinkedIn: [linkedin.com/in/nisha-karthikeyan](https://www.linkedin.com/in/nisha-karthikeyan)
 
 ## License
 
