@@ -51,7 +51,7 @@ dependencies = [
 [project.optional-dependencies]
 # Tools for contributors; InvenTree's own requirements are installed separately.
 dev = [
-    "ruff==0.16.10",
+    "ruff==0.17.1",
     "coverage>=7",
 ]
 
