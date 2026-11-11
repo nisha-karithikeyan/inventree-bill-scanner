@@ -24,7 +24,7 @@
     "jsdom": "^26.1.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "typescript": "^5.9.0",
+    "typescript": "^7.0.2",
     "vite": "^7.0.0",
     "vite-plugin-externals": "^0.6.2",
     "vitest": "^3.2.0"
